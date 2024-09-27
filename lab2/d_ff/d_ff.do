@@ -1,4 +1,6 @@
-# Force the clock signal (10ns period)
+restart -f
+
+#写一个周期为20ns完成10切换的clk信号
 force clk 0 0ns, 1 5ns -repeat 10ns  
 
 # Test Case 1: Active low reset when q is low
