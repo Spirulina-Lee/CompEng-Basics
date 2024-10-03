@@ -6,9 +6,9 @@ module seg7 (
 );
 
 always_comb begin
-    if (!blank)
+    if (blank)
         seg_out = 7'b1111111;  // Turn off all segments (0 to light up, high to turn off)
-    else if (!test)
+    else if (test)
         seg_out = 7'b0000000;  // Turn on all segments
     else
         case(bin_in)  // Select output based on input value
