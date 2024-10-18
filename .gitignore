@@ -1,0 +1,15 @@
+# Ignore transcript files
+**/transcript
+
+# Ignore vsim wave log files
+**/vsim.wlf
+
+# Ignore all work directories and their contents
+**/work/
+
+# Or, alternatively, ignore specific work directory files
+**/work/*.qdb
+**/work/*.qpg
+**/work/*.qtl
+**/work/_vmake
+
