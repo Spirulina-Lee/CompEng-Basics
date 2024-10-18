@@ -1,5 +1,8 @@
-restart -f
+# 加载编译后的设计模块
+vsim work.jk_ff
 
+# 设置波形窗口中显示的信号
+add wave -r /*
 force clk 1 0ns, 0 50ns -repeat 100ns  
 
 force reset 0 0ns

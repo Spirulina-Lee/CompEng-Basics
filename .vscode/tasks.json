@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Create Work Library",
+      "type": "shell",
+      "command": "vlib",
+      "args": [
+        "${fileDirname}\\work"  // 创建当前目录的 work 库
+      ],
+      "options": {
+        "cwd": "${fileDirname}"  // 设置工作目录为当前文件所在的目录
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Compile",
+      "type": "shell",
+      "command": "vlog",
+      "args": [
+        "-work", "${fileDirname}\\work",  // 编译到当前目录的 work 库
+        "${fileDirname}\\${fileBasenameNoExtension}.sv"  // 编译当前文件
+      ],
+      "options": {
+        "cwd": "${fileDirname}"  // 设置工作目录为当前文件所在的目录
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Simulate in ModelSim GUI",
+      "type": "shell",
+      "command": "vsim",
+      "args": [
+        "-work", "${fileDirname}\\work",  // 使用当前目录下的 work 库
+        "${fileBasenameNoExtension}",     // 仿真当前模块（从文件名推断）
+        "-do", "${fileDirname}\\${fileBasenameNoExtension}.do"  // 加载 .do 文件
+      ],
+      "options": {
+        "cwd": "${fileDirname}"  // 设置为当前文件所在的目录
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run do file Simulation",
+      "type": "shell",
+      "command": "vsim",
+      "args": [
+        "-do", "${fileDirname}\\${fileBasenameNoExtension}.do",  // 加载当前目录的 .do 文件
+        "-work", "${fileDirname}\\work"  // 使用当前目录的工作库
+      ],
+      "options": {
+        "cwd": "${fileDirname}"  // 设置工作目录为当前文件所在目录
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}
