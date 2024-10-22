@@ -29,8 +29,8 @@ module alu_tb (
         .bin_in(AC), 
         .blank(1'b0),                  // 不熄灭显示
         .test(1'b0),                   // 不启用测试模式
-        .out1(HEX5), 
-        .out0(HEX4)
+        .out1(HEX3), 
+        .out0(HEX2)
     );
 
     // 实例化PC模块，PC加载信号来自KEY[3]，PC输出到HEX2和HEX3，同时作为ALU的MDR输入
@@ -48,8 +48,8 @@ module alu_tb (
         .bin_in(MDR), 
         .blank(1'b0),                  // 不熄灭显示
         .test(1'b0),                   // 不启用测试模式
-        .out1(HEX3), 
-        .out0(HEX2)
+        .out1(HEX5), 
+        .out0(HEX4)
     );
 
     // 实例化IR模块，IR用于加载操作码和立即数，同时将IRL输出到LEDR[7:0]
