@@ -29,8 +29,8 @@ module alu (
             5'b01011: Z = AC & MDR;                    // AND address
             5'b01100: Z = AC | MDR;                    // OR address
             5'b01101: Z = AC ^ MDR;                    // XOR address
-            5'b01110: Z = AC <<< value[2:0];           // SHL value (左移，使用算术移位)
-            5'b01111: Z = AC >>> value[2:0];           // SHR value (右移，使用算术移位)
+            5'b01110: Z = AC << value[2:0];           // SHL value (左移，使用算术移位)
+            5'b01111: Z = AC >> value[2:0];           // SHR value (右移，使用算术移位)
             5'b10000: /* JUMP operation (handled by control logic) */;
             5'b10001: /* JNEG operation (handled by control logic) */;
             5'b10010: /* JPOSZ operation (handled by control logic) */;
@@ -39,9 +39,9 @@ module alu (
             default: Z = AC;                           // 未定义操作码，执行NOP
         endcase
 
-        // 设置标志位
-        ZFLG = (Z == 8'b0);   // 当Z为0时，ZFLG标志置位
-        NFLG = Z[7];          // 当Z为负时（最高位为1），NFLG标志置位
+        // 设置标志位：基于AC的值
+        ZFLG = (AC == 8'b0);   // 当AC为0时，ZFLG标志置位
+        NFLG = AC[7];          // 当AC为负时（最高位为1），NFLG标志置位
     end
 
 endmodule
