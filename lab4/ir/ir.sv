@@ -1,4 +1,4 @@
-module instruction_register (
+module ir (
     input logic clk,            // 时钟信号
     input logic reset,          // 复位信号
     input logic load_iru,       // 加载IRU寄存器控制信号
