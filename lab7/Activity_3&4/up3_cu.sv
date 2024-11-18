@@ -1,15 +1,13 @@
 module up3_cu (
     input logic [1:0] KEY,             // KEY[0]: clk, KEY[1]: reset
-    output logic [6:0] HEX0, HEX1,     // HEX0、HEX1 显示 addr/value
-    output logic [6:0] HEX2, HEX3,     // HEX2、HEX3 显示 opcode
-    output logic [6:0] HEX4, HEX5,     // HEX4、HEX5 显示 PC
-    output logic [9:0] LEDR            // 指示状态
+    output logic [9:0] LEDR,           // 指示状态
+    // 将内部信号暴露为输出，以供 tb 使用
+    output logic [7:0] ir_lower,       // IRL 的输出 (addr/value)
+    output logic [7:0] ir_upper,       // IRU 的输出 (opcode)
+    output logic [7:0] pc_out          // PC 的输出
 );
 
     // 内部信号声明
-    logic [7:0] pc_out;                // PC 的输出
-    logic [7:0] ir_upper;              // IRU 的输出 (opcode)
-    logic [7:0] ir_lower;              // IRL 的输出 (addr/value)
     logic [7:0] alu_result;            // ALU 的输出 (Z)
     logic [7:0] ram_out;               // RAM 的输出 (MDR)
     logic [7:0] address;               // RAM 地址
@@ -25,19 +23,19 @@ module up3_cu (
 
     // 实例化 Control 模块
     control control_inst (
-        .opcode(ir_upper[7:0]),   // IRU 的输出作为 opcode 输入
-        .NFLG(NFLG),              // ALU 的负数标志
-        .ZFLG(ZFLG),              // ALU 的零标志
-        .RESET(reset),            // 重置信号
-        .CLK(clk),                // 时钟信号
-        .STATE(state),            // 当前状态输出
-        .LOAD_AC(LOAD_AC),        // 加载 AC 信号
-        .LOAD_IRU(LOAD_IRU),      // 加载 IRU 信号
-        .LOAD_IRL(LOAD_IRL),      // 加载 IRL 信号
-        .LOAD_PC(LOAD_PC),        // 加载 PC 信号
-        .INC_PC(INC_PC),          // 增加 PC 信号
-        .FETCH(FETCH),            // FETCH 信号
-        .STORE_MEM(STORE_MEM)     // 存储信号
+        .opcode(ir_upper),
+        .NFLG(NFLG),
+        .ZFLG(ZFLG),
+        .RESET(reset),
+        .CLK(clk),
+        .STATE(state),
+        .LOAD_AC(LOAD_AC),
+        .LOAD_IRU(LOAD_IRU),
+        .LOAD_IRL(LOAD_IRL),
+        .LOAD_PC(LOAD_PC),
+        .INC_PC(INC_PC),
+        .FETCH(FETCH),
+        .STORE_MEM(STORE_MEM)
     );
 
     // 实例化 PC 模块
@@ -80,8 +78,7 @@ module up3_cu (
         .NFLG(NFLG)
     );
 
-    // 地址选择逻辑由控制模块的状态决定，无需额外的 MUX 逻辑
-    // 当 FETCH 信号有效时，地址为 PC；否则，地址为 IRL（addr/value）
+    // 地址选择逻辑，由控制信号 FETCH 决定
     assign address = (FETCH) ? pc_out : ir_lower;
 
     // 实例化 RAM 模块
@@ -93,32 +90,7 @@ module up3_cu (
         .q(ram_out)
     );
 
-    // 显示 addr/value 到 HEX0 和 HEX1
-    dual_seg7 display_addr_value (
-        .bin_in(ir_lower),
-        .blank(1'b0),
-        .test(1'b0),
-        .out1(HEX1),
-        .out0(HEX0)
-    );
-
-    // 显示 opcode 到 HEX2 和 HEX3
-    dual_seg7 display_opcode (
-        .bin_in(ir_upper),
-        .blank(1'b0),
-        .test(1'b0),
-        .out1(HEX3),
-        .out0(HEX2)
-    );
-
-    // 显示 PC 到 HEX4 和 HEX5
-    dual_seg7 display_pc (
-        .bin_in(pc_out),
-        .blank(1'b0),
-        .test(1'b0),
-        .out1(HEX5),
-        .out0(HEX4)
-    );
+    // 移除 dual_seg7 模块的实例化
 
     // 指示状态到 LEDR
     assign LEDR[0] = STORE_MEM;
