@@ -1,10 +1,18 @@
 module up3_cu (
     input logic [1:0] KEY,             // KEY[0]: clk, KEY[1]: reset
-    output logic [9:0] LEDR,           // 指示状态
     // 将内部信号暴露为输出，以供 tb 使用
     output logic [7:0] ir_lower,       // IRL 的输出 (addr/value)
     output logic [7:0] ir_upper,       // IRU 的输出 (opcode)
-    output logic [7:0] pc_out          // PC 的输出
+    output logic [7:0] pc_out,         // PC 的输出
+    // 将控制信号暴露为输出，以供 tb 使用
+    output logic STORE_MEM,
+    output logic FETCH,
+    output logic INC_PC,
+    output logic LOAD_PC,
+    output logic LOAD_IRL,
+    output logic LOAD_IRU,
+    output logic LOAD_AC,
+    output logic [2:0] state           // 控制模块状态输出
 );
 
     // 内部信号声明
@@ -13,9 +21,7 @@ module up3_cu (
     logic [7:0] address;               // RAM 地址
     logic [7:0] ac_out;                // AC 的输出
     logic ZFLG, NFLG;                  // ALU 标志
-    logic LOAD_AC, LOAD_IRU, LOAD_IRL, LOAD_PC, INC_PC, FETCH, STORE_MEM; // 控制信号
     logic clk, reset;                  // 时钟和复位信号
-    logic [2:0] state;                 // 控制模块状态输出
 
     // 分配按键
     assign clk = ~KEY[0];   // KEY[0] 上升沿工作，下降沿生成时钟
@@ -89,17 +95,5 @@ module up3_cu (
         .wren(STORE_MEM),
         .q(ram_out)
     );
-
-    // 移除 dual_seg7 模块的实例化
-
-    // 指示状态到 LEDR
-    assign LEDR[0] = STORE_MEM;
-    assign LEDR[1] = FETCH;
-    assign LEDR[2] = INC_PC;
-    assign LEDR[3] = LOAD_PC;
-    assign LEDR[4] = LOAD_IRL;
-    assign LEDR[5] = LOAD_IRU;
-    assign LEDR[6] = LOAD_AC;
-    assign LEDR[9:7] = state; // 显示控制模块的状态
 
 endmodule

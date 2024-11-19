@@ -10,14 +10,24 @@ module up3_cu_tb (
     logic [7:0] ir_lower;
     logic [7:0] ir_upper;
     logic [7:0] pc_out;
+    // 从 up3_cu 模块输出的控制信号
+    logic STORE_MEM, FETCH, INC_PC, LOAD_PC, LOAD_IRL, LOAD_IRU, LOAD_AC;
+    logic [2:0] state;
 
     // 实例化 up3_cu 模块
     up3_cu uut (
         .KEY(KEY),
-        .LEDR(LEDR),
         .ir_lower(ir_lower),
         .ir_upper(ir_upper),
-        .pc_out(pc_out)
+        .pc_out(pc_out),
+        .STORE_MEM(STORE_MEM),
+        .FETCH(FETCH),
+        .INC_PC(INC_PC),
+        .LOAD_PC(LOAD_PC),
+        .LOAD_IRL(LOAD_IRL),
+        .LOAD_IRU(LOAD_IRU),
+        .LOAD_AC(LOAD_AC),
+        .state(state)
     );
 
     // 在 tb 中实例化 dual_seg7 模块
@@ -48,5 +58,15 @@ module up3_cu_tb (
         .out1(HEX5),
         .out0(HEX4)
     );
+
+    // 指示状态到 LEDR
+    assign LEDR[0] = STORE_MEM;
+    assign LEDR[1] = FETCH;
+    assign LEDR[2] = INC_PC;
+    assign LEDR[3] = LOAD_PC;
+    assign LEDR[4] = LOAD_IRL;
+    assign LEDR[5] = LOAD_IRU;
+    assign LEDR[6] = LOAD_AC;
+    assign LEDR[9:7] = state; // 显示控制模块的状态
 
 endmodule
