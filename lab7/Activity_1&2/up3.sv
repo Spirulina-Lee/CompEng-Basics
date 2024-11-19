@@ -84,3 +84,4 @@ module up3 (
         .wren(STORE_MEM),
         .q(ram_out)
     );
+endmodule
