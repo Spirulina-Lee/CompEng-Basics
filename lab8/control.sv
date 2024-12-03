@@ -1,187 +1,198 @@
 module control (
-    input logic [7:0] opcode,
-    input logic NFLG,
-    input logic ZFLG,
-    input logic RESET,
     input logic CLK,
-    output logic [3:0] STATE,
-    output logic LOAD_AC,
+    input logic RESET,
+    input logic [7:0] opcode,
+    input logic ZFLG,
+    input logic NFLG,
+
+    output logic FETCH,
+    output logic INC_PC,
+    output logic LOAD_PC,
     output logic LOAD_IRU,
     output logic LOAD_IRL,
-    output logic LOAD_PC,
-    output logic INC_PC,
-    output logic FETCH,
+    output logic LOAD_AC,
     output logic STORE_MEM,
-    output logic MEM_READ,
-    output logic MEM_WRITE
+    output logic [3:0] STATE
 );
 
-    // 定义操作码
-    localparam NOP    = 5'b00000;
-    localparam LOAD   = 5'b00001;
-    localparam LOADI  = 5'b00010;
-    localparam STORE  = 5'b00011;
-    localparam CLR    = 5'b00100;
-    localparam ADD    = 5'b00101;
-    localparam ADDI   = 5'b00110;
-    localparam SUBT   = 5'b00111;
-    localparam SUBTI  = 5'b01000;
-    localparam NEG    = 5'b01001;
-    localparam NOT    = 5'b01010;
-    localparam AND    = 5'b01011;
-    localparam OR     = 5'b01100;
-    localparam XOR    = 5'b01101;
-    localparam SHL    = 5'b01110;
-    localparam SHR    = 5'b01111;
-    localparam JUMP   = 5'b10000;
-    localparam JNEG   = 5'b10001;
-    localparam JPOSZ  = 5'b10010;
-    localparam JZERO  = 5'b10011;
-    localparam JNZER  = 5'b10100;
+    logic [3:0] state, state_next;
+    logic [4:0] opcode5;
 
-    typedef enum logic [3:0] {
-        Start       = 4'b0000,
-        PrepU       = 4'b0001,
-        FetchU      = 4'b0010,
-        PrepL       = 4'b0011,
-        FetchL      = 4'b0100,
-        Class1      = 4'b0101,
-        Class2      = 4'b0110,
-        Class3_Prep = 4'b0111, // 新增状态：准备读取内存
-        Class3_Exec = 4'b1000, // 新增状态：执行内存读取后的操作
-        Class4      = 4'b1001,
-        Class5      = 4'b1010
-    } STATE_TYPE;
+    assign opcode5 = opcode[4:0];
 
-    STATE_TYPE current_state, next_state;
+    parameter  START  = 4'd0,
+               PrepU  = 4'd1,   
+               FetchU = 4'd2,
+               PrepL  = 4'd3,
+               FetchL = 4'd4,
+               Class1 = 4'd5,
+               Class2 = 4'd6,
+               Class3 = 4'd7,
+               Class4 = 4'd8,
+               Class5 = 4'd9;
 
-    always_ff @(negedge CLK or posedge RESET) begin
-        if (RESET) 
-            current_state <= Start; 
-        else 
-            current_state <= next_state; 
+    always @(negedge CLK or posedge RESET)
+        if (RESET)
+            state <= START;
+        else
+            state <= state_next;
+
+    initial begin
+        FETCH     = 0;
+        INC_PC    = 0;
+        LOAD_PC   = 0;
+        LOAD_IRU  = 0;
+        LOAD_IRL  = 0;
+        LOAD_AC   = 0;
+        STORE_MEM = 0;
     end
 
-    always_comb begin
-        // 默认情况下，所有控制信号为 0
-        LOAD_AC    = 1'b0;
-        LOAD_IRU   = 1'b0;
-        LOAD_IRL   = 1'b0;
-        LOAD_PC    = 1'b0;
-        INC_PC     = 1'b0;
-        FETCH      = 1'b0;
-        STORE_MEM  = 1'b0;
-        MEM_READ   = 1'b0;
-        MEM_WRITE  = 1'b0;
-
-        next_state = current_state;  // 默认保持当前状态
-
-        case (current_state)
-            Start: begin
-                LOAD_PC = 1'b1;
-                next_state = PrepU;
-            end
-
-            PrepU: begin
-                FETCH = 1'b1;
-                next_state = FetchU;
-            end
-
-            FetchU: begin
-                LOAD_IRU = 1'b1;
-                INC_PC = 1'b1;
-                // 在 FetchU 后解码 opcode，决定下一个状态
-                if (opcode[4:0] == NOP || opcode[4:0] == CLR) begin
-                    next_state = Class1;
-                end else begin
-                    next_state = PrepL;
+    always @(*) begin
+        if (RESET) begin
+            FETCH     = 0;
+            INC_PC    = 0;
+            LOAD_PC   = 0;
+            LOAD_IRU  = 0;
+            LOAD_IRL  = 0;
+            LOAD_AC   = 0;
+            STORE_MEM = 0;
+            state_next = Class1;   
+        end else begin
+            case (state)
+                START: begin
+                    FETCH     = 0;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 0;
+                    state_next = PrepU;
+                end  
+                PrepU: begin
+                    FETCH     = 1;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 0;
+                    state_next = FetchU;
                 end
-            end
-
-            PrepL: begin
-                FETCH = 1'b1;
-                next_state = FetchL;
-            end
-
-            FetchL: begin
-                LOAD_IRL = 1'b1;
-                INC_PC = 1'b1;
-                // 在 FetchL 后解码 opcode，决定下一个状态
-                unique case (opcode[4:0])
-                    LOADI, ADDI, SUBTI, SHL, SHR: begin
-                        next_state = Class2;
-                    end
-
-                    LOAD, ADD, SUBT, NEG, NOT, AND, OR, XOR: begin
-                        next_state = Class3_Prep;
-                    end
-
-                    STORE: begin
-                        next_state = Class4;
-                    end
-
-                    JUMP, JNEG, JPOSZ, JZERO, JNZER: begin
-                        next_state = Class5;
-                    end
-
-                    default: begin
-                        next_state = Start;  // 未定义的操作码，重置
-                    end
-                endcase
-            end
-
-            Class1: begin
-                if (opcode[4:0] == CLR) begin
-                    LOAD_AC = 1'b1;  // AC <= 0，由 ALU 实现
+                FetchU: begin
+						      FETCH     = 1;
+                        INC_PC    = 1;
+                        LOAD_PC   = 0;
+                        LOAD_IRU  = 1;
+                        LOAD_IRL  = 0;
+                        LOAD_AC   = 0;
+                        STORE_MEM = 0;
+                    if (opcode5 == 5'h00 || opcode5 == 5'h04) begin  // NOP or CLR                  
+                        state_next = Class1;               
+                    end else begin       
+                        state_next = PrepL; 
+                    end 
+                end 
+                PrepL: begin
+                    FETCH     = 1;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 0;
+                    state_next = FetchL;   
                 end
-                // NOP 不需要任何操作
-                next_state = PrepU;  // 返回取指阶段
-            end
-
-            Class2: begin
-                LOAD_AC = 1'b1;  // 将 Z 存入 AC，保存结果
-                next_state = PrepU;
-            end
-
-            // 修改后的 Class3，拆分为两个状态
-            Class3_Prep: begin
-                // 准备从内存读取数据
-                MEM_READ = 1'b1;  // 启用内存读取
-                // 在此周期中，地址（address）已经被设置为 IRL
-                next_state = Class3_Exec;
-            end
-
-            Class3_Exec: begin
-                // 等待内存读取完成，然后将 ALU 的结果存入 AC
-                LOAD_AC = 1'b1;  // 将 Z 存入 AC，保存结果
-                next_state = PrepU;
-            end
-
-            Class4: begin
-                // 准备写入内存
-                MEM_WRITE = 1'b1;
-                STORE_MEM = 1'b1;  // 使能内存写操作
-                next_state = PrepU;
-            end
-
-            Class5: begin
-                // 根据条件决定是否跳转
-                if ( (opcode[4:0] == JUMP) ||
-                     (opcode[4:0] == JNEG  && NFLG) ||
-                     (opcode[4:0] == JPOSZ && !NFLG) ||
-                     (opcode[4:0] == JZERO && ZFLG) ||
-                     (opcode[4:0] == JNZER && !ZFLG) ) begin
-                    LOAD_PC = 1'b1;  // 将 IRL 加载到 PC
+                FetchL: begin
+								FETCH     = 1;
+                        INC_PC    = 1;
+                        LOAD_PC   = 0;
+                        LOAD_IRU  = 0;
+                        LOAD_IRL  = 1;
+                        LOAD_AC   = 0;
+                        STORE_MEM = 0;
+                    if (opcode5 == 5'h02 || opcode5 == 5'h06 || opcode5 == 5'h08 || opcode5 == 5'h0E || opcode5 == 5'h0F) begin
+                        state_next = Class2;   
+                    end else if (opcode5 == 5'h01 || opcode5 == 5'h05 || opcode5 == 5'h07 || opcode5 == 5'h09 || opcode5 == 5'h0A || opcode5 == 5'h0B || opcode5 == 5'h0C || opcode5 == 5'h0D) begin     
+                        state_next = Class3;   
+                    end else if (opcode5 == 5'h03) begin // STORE                
+                        state_next = Class4;               
+                    end else begin
+                        state_next = Class5;               
+                    end     
                 end
-                next_state = PrepU;
-            end
-
-            default: begin
-                next_state = Start;
-            end
-        endcase
+                Class1: begin
+                    FETCH     = 0;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+						  LOAD_AC = 1;
+						  STORE_MEM = 0;
+                    state_next = PrepU;              
+                end
+                Class2: begin
+                    FETCH     = 0;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 1;
+                    STORE_MEM = 0;
+                    state_next = PrepU;              
+                end
+                Class3: begin
+                    FETCH     = 0;  // Initiate memory read from address in IRL
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 0;
+                    state_next = Class2;              
+                end
+                Class4: begin // STORE
+                    FETCH     = 0;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 1;
+                    state_next = PrepU;              
+                end
+                Class5: begin // Jumps
+                    FETCH     = 0;
+                    INC_PC    = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 0;
+                    // Handle different jump instructions
+                    case (opcode)
+                        5'h10: LOAD_PC = 1;                      // JUMP
+                        5'h11: LOAD_PC = NFLG ? 1 : 0;           // JNEG
+                        5'h12: LOAD_PC = (~NFLG) ? 1 : 0;        // JPOSZ
+                        5'h13: LOAD_PC = ZFLG ? 1 : 0;           // JZERO
+                        5'h14: LOAD_PC = (~ZFLG) ? 1 : 0;        // JNZER
+                        default: LOAD_PC = 0;
+                    endcase
+                    state_next = PrepU;  
+                end
+                default: begin
+                    FETCH     = 0;
+                    INC_PC    = 0;
+                    LOAD_PC   = 0;
+                    LOAD_IRU  = 0;
+                    LOAD_IRL  = 0;
+                    LOAD_AC   = 0;
+                    STORE_MEM = 0;
+                    state_next = START;               
+                end 
+            endcase
+        end
     end
 
-    assign STATE = current_state;
+    assign STATE = state;
 
 endmodule
