@@ -122,12 +122,12 @@ module control (
                     end     
                 end
                 Class1: begin
-                    FETCH     = 0;
+                    FETCH     = 1;
                     INC_PC    = 0;
                     LOAD_PC   = 0;
                     LOAD_IRU  = 0;
                     LOAD_IRL  = 0;
-						  LOAD_AC = 1;
+						  LOAD_AC = 0;
 						  STORE_MEM = 0;
                     state_next = PrepU;              
                 end
