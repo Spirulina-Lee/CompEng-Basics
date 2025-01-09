@@ -1,31 +1,59 @@
-# EE310 - 计算机工程基础
+# **FPGA Labs - SystemVerilog**
+> **Course 课程**: EE310  
+> **University 大学**: Northern Arizona University  
 
-本仓库包含 EE310 课程中与计算机工程基础相关的代码和文档，包括实验以及项目内容。
+This repository contains the labs, assignments, and past exam materials for the EE310 course, focusing on FPGA development using the Intel 5CSMA5F31C6 FPGA board and SystemVerilog programming.  
+本仓库包含 EE310 课程的实验、作业以及往年考试资料，重点是使用 Intel 5CSMA5F31C6 FPGA 开发板和 SystemVerilog 语言进行开发。
 
-## 目录
+---
 
-- [课程概述](#课程概述)
-- [实验](#实验)
-- [项目](#项目)
-- [贡献指南](#贡献指南)
+## Repository Structure 仓库结构
+- **Exam 考试资料**: Includes past exam papers and resources provided by senior Yixin Wang for review.  
+  包含往年考试卷子和学长 Yixin Wang 提供的复习资料。
+- **Lab1 - Lab8 实验**: Source code, test benches, and simulation files for all lab exercises.  
+  包括所有实验的源代码、测试代码和仿真文件。
+- **Project 课程项目**: The final course project, including design files, reports, and documentation.  
+  包含最终课程项目的设计文件、报告和文档。
+- **Pin Information 管脚信息**: Text files specifying the pin mappings and configurations for the FPGA board.  
+  包含 FPGA 开发板的管脚映射和配置的文本文件。
 
-## 课程概述
+---
 
-EE310 课程涵盖了计算机工程的基本概念，包括数字逻辑设计、微处理器、计算机体系结构和嵌入式系统等内容。
+## Intel 5CSMA5F31C6 FPGA Overview Intel 5CSMA5F31C6 FPGA 概述
+The Intel 5CSMA5F31C6 is an FPGA from the Cyclone V series, providing high performance and low power consumption. It is commonly used in embedded systems and digital design applications.  
+Intel 5CSMA5F31C6 是 Cyclone V 系列的 FPGA，提供高性能和低功耗，广泛用于嵌入式系统和数字设计应用。
 
-## 实验
+---
 
-实验内容位于 `labs/` 目录中。每个实验都有自己的子目录，包括：
+## Getting Started 入门
+To use this repository, ensure you have access to:  
+使用本仓库前，请确保您具备以下工具：
+- **Intel 5CSMA5F31C6 FPGA Development Board**  
+  Intel 5CSMA5F31C6 FPGA 开发板
+- **Intel Quartus Prime** or another compatible IDE for FPGA development  
+  或其他兼容 FPGA 开发的 IDE
 
-- 源代码及仿真文件。
-- 实验报告或分析文档。
+---
 
-## 项目
+### Cloning the Repository 克隆仓库
+1. Open your terminal and run the following command:  
+   打开终端并运行以下命令：
+   ```bash
+   git clone https://github.com/Spirulina-Lee/CompEng-Basics.git
+   ```
+2. Alternatively, click the Code button, then Download ZIP to download all files without needing Git.
+> ***可能需要科学的网络环境***
 
-`projects/` 目录包含更复杂的项目，这些项目可能涉及课程的多个方面。每个项目目录包含以下内容：
+### Running Code 运行代码
+1. Import the project into Intel Quartus Prime.
+将项目导入 Intel Quartus Prime。
+2. Compile and synthesize the SystemVerilog code.
+编译并综合 SystemVerilog 代码。
+3. Upload the generated bitstream file to the FPGA board.
+将生成的比特流文件上传到 FPGA 开发板。
+4. Follow the instructions in each lab report or project documentation for specific configurations and tests.
+根据每个实验报告或项目文档中的说明进行特定的配置和测试。
 
-- 设计文档。
-- 源代码及测试文件。
 
 ## 贡献指南
 
