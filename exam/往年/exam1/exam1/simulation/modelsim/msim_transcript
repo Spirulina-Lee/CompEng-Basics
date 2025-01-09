@@ -1,0 +1,36 @@
+# Reading pref.tcl
+# do mux8to1_run_msim_rtl_verilog.do
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work rtl_work 
+# Copying F:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# 
+# vlog -sv -work work +incdir+E:/Belis/homework/NAU/EE310/exam1 {E:/Belis/homework/NAU/EE310/exam1/mux8to1.sv}
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 09:23:57 on Oct 23,2020
+# vlog -reportprogress 300 -sv -work work "+incdir+E:/Belis/homework/NAU/EE310/exam1" E:/Belis/homework/NAU/EE310/exam1/mux8to1.sv 
+# -- Compiling module mux8to1
+# 
+# Top level modules:
+# 	mux8to1
+# End time: 09:23:57 on Oct 23,2020, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# 
+vsim work.mux8to1
+# vsim work.mux8to1 
+# Start time: 09:24:38 on Oct 23,2020
+# Loading sv_std.std
+# Loading work.mux8to1
+add wave -position insertpoint  \
+sim:/mux8to1/sel \
+sim:/mux8to1/D \
+sim:/mux8to1/en \
+sim:/mux8to1/Y
+do mux8to1.do
+do mux8to1.do
+do mux8to1.do

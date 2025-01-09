@@ -1,0 +1,13 @@
+//EE 310 Fundamentals of Computer Engineering
+//Assignment: exam1
+//Author: Cheng Anzhe
+//Module Name: mux8to1
+//Module Function:  8-to-1 multiplexer testbench
+//**************************************************************************************
+
+//Module Declaration
+module mux8to1_tb(input logic [0:2] KEY, input logic [0:9] SW,
+               output logic LEDR);
+					
+mux8to1 mux(.sel(~KEY), .D(SW),  .Y(LEDR), .en(SW[9]));
+endmodule
